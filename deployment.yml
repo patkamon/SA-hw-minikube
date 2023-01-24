@@ -1,0 +1,43 @@
+---
+kind: Service
+apiVersion: v1
+metadata:
+  name: exampleservice
+spec:
+  selector:
+    app: test-kube
+  ports:
+    - protocol: "TCP"
+      # Port accessible inside cluster
+      port: 8081
+      # Port to forward to inside the pod
+      targetPort: 8080
+      # Port accessible outside cluster
+      nodePort: 30002
+  type: LoadBalancer
+ 
+ 
+ 
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: test-kube-deploy
+spec:
+  selector:
+    matchLabels:
+      app: test-kube
+  replicas: 5
+  template:
+    metadata:
+      labels:
+        app: test-kube
+    spec:
+      containers:
+        - name: test-kube
+          image: patkamon/test-kube:v2
+          env:
+            - name: PORT 
+              value: "8080"
+          ports:
+            - containerPort: 8080
